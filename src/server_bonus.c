@@ -6,7 +6,7 @@
 /*   By: lrecine- <lrecine-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 19:57:19 by lrecine-          #+#    #+#             */
-/*   Updated: 2024/12/15 19:57:44 by lrecine-         ###   ########.fr       */
+/*   Updated: 2025/01/16 14:54:10 by lrecine-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ void	ft_btoa(int sig, siginfo_t *info, void *context)
 	if (bit == 8)
 	{
 		if (i == 0)
+		{
 			kill(info->si_pid, SIGUSR2);
+			ft_printf("\n");
+		}
 		ft_printf("%c", i);
 		bit = 0;
 		i = 0;
@@ -46,7 +49,7 @@ int	main(int argc, char **argv)
 	ft_printf("%d\n", pid);
 	act.sa_sigaction = ft_btoa;
 	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
+	act.sa_flags = SA_SIGINFO;
 	while (argc == 1)
 	{
 		sigaction(SIGUSR1, &act, NULL);

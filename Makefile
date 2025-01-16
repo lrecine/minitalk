@@ -10,8 +10,8 @@ BONUSS_FILES = server_bonus.c
 SRC_DIR = src/
 SRCC = $(addprefix $(SRC_DIR), $(SRCC_FILES))
 SRCS = $(addprefix $(SRC_DIR), $(SRCS_FILES))
-BONUS = $(addprefix $(SRC_DIR), $(BONUSC_FILES))
-BONUS = $(addprefix $(SRC_DIR), $(BONUSS_FILES))
+BONUSC = $(addprefix $(SRC_DIR), $(BONUSC_FILES))
+BONUSS = $(addprefix $(SRC_DIR), $(BONUSS_FILES))
 OBJC = ${SRCC:.c=.o}
 OBJS = ${SRCS:.c=.o}
 OBJBC = ${BONUSC:.c=.o}

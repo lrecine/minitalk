@@ -6,7 +6,7 @@
 /*   By: lrecine- <lrecine-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 19:57:11 by lrecine-          #+#    #+#             */
-/*   Updated: 2024/12/15 19:57:13 by lrecine-         ###   ########.fr       */
+/*   Updated: 2025/01/16 14:34:00 by lrecine-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,27 @@
 
 static int	ft_atoi(const char *str)
 {
-	int					i;
-	int					sign;
-	unsigned long int	result;
+	int		i;
+	int		neg;
+	int		nb;
 
 	i = 0;
-	sign = 1;
-	result = 0;
-	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+	neg = 1;
+	nb = 0;
+	while (str[i] == ' ' || (str[i] >= '\t' && str[i] <= '\r'))
 		i++;
-	if (str[i] == '-')
+	if (str[i] == '-' || str[i] == '+')
 	{
-		sign = -1;
+		if (str[i] == '-')
+			neg = -1;
 		i++;
 	}
-	else if (str[i] == '+')
-		i++;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
-		result *= 10;
-		result += str[i] - '0';
+		nb = nb * 10 + (str[i] - '0');
 		i++;
 	}
-	return (result * sign);
+	return (nb * neg);
 }
 
 void	ft_atob(int pid, char c)

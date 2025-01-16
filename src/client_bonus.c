@@ -6,7 +6,7 @@
 /*   By: lrecine- <lrecine-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 19:56:55 by lrecine-          #+#    #+#             */
-/*   Updated: 2024/12/15 19:57:03 by lrecine-         ###   ########.fr       */
+/*   Updated: 2025/01/16 15:04:16 by lrecine-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,34 +15,32 @@
 void	confirm_msg(int signal)
 {
 	if (signal == SIGUSR2)
-		ft_printf("message recieved\n");
+		ft_printf("\033[0;32mmessage recieved ✓\033[0m\n");
 }
 
 static int	ft_atoi(const char *str)
 {
-	int					i;
-	int					sign;
-	unsigned long int	result;
+	int		i;
+	int		neg;
+	int		nb;
 
 	i = 0;
-	sign = 1;
-	result = 0;
-	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+	neg = 1;
+	nb = 0;
+	while (str[i] == ' ' || (str[i] >= '\t' && str[i] <= '\r'))
 		i++;
-	if (str[i] == '-')
+	if (str[i] == '-' || str[i] == '+')
 	{
-		sign = -1;
+		if (str[i] == '-')
+			neg = -1;
 		i++;
 	}
-	else if (str[i] == '+')
-		i++;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
-		result *= 10;
-		result += str[i] - '0';
+		nb = nb * 10 + (str[i] - '0');
 		i++;
 	}
-	return (result * sign);
+	return (nb * neg);
 }
 
 void	ft_atob(int pid, char c)
@@ -70,17 +68,17 @@ int	main(int argc, char **argv)
 	if (argc == 3)
 	{
 		pid = ft_atoi(argv[1]);
+		signal(SIGUSR2, confirm_msg);
 		while (argv[2][i] != '\0')
 		{
 			ft_atob(pid, argv[2][i]);
 			i++;
 		}
-		signal(SIGUSR2, confirm_msg);
 		ft_atob(pid, '\0');
 	}
 	else
 	{
-		ft_printf("Error\n");
+		ft_printf("\033[0;31mError ❌\033[0m\n");
 		return (1);
 	}
 	return (0);
