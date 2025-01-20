@@ -6,55 +6,66 @@
 /*   By: lrecine- <lrecine-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 19:57:19 by lrecine-          #+#    #+#             */
-/*   Updated: 2025/01/16 14:54:10 by lrecine-         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:23:01 by lrecine-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk_bonus.h"
 
-void	ft_btoa(int sig, siginfo_t *info, void *context)
+int	char_completed(char **str, char *c, int *bit_c, siginfo_t *info)
 {
-	static int	bit;
-	static int	i;
+	char	*temp;
 
-	(void)context;
-	if (sig == SIGUSR1)
-		i |= (0x01 << bit);
-	bit++;
-	if (bit == 8)
+	if (*c == 0)
 	{
-		if (i == 0)
-		{
-			kill(info->si_pid, SIGUSR2);
-			ft_printf("\n");
-		}
-		ft_printf("%c", i);
-		bit = 0;
-		i = 0;
+		ft_printf("%s\n", *str);
+		free(*str);
+		*bit_c = 0;
+		*str = NULL;
+		kill(info->si_pid, SIGUSR2);
+		return (0);
 	}
+	temp = ft_strjoin(*str, c);
+	free(*str);
+	*str = temp;
+	*c = 0;
+	*bit_c = 0;
+	return (1);
 }
 
-int	main(int argc, char **argv)
+void	print_signal(int signal, siginfo_t *info, void *context)
 {
-	int					pid;
-	struct sigaction	act;
+	static char		c = 0;
+	static char		*str = NULL;
+	static int		bit_count = 0;
 
-	(void)argv;
-	if (argc != 1)
+	context = NULL;
+	c <<= 1;
+	if (signal == SIGUSR2)
+		c |= 1;
+	if (!str)
+		str = ft_strdup("");
+	bit_count++;
+	if (bit_count == 8)
 	{
-		ft_printf("Error\n");
-		return (1);
+		if (!char_completed(&str, &c, &bit_count, info))
+			return ;
 	}
-	pid = getpid();
-	ft_printf("%d\n", pid);
-	act.sa_sigaction = ft_btoa;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_SIGINFO;
-	while (argc == 1)
-	{
-		sigaction(SIGUSR1, &act, NULL);
-		sigaction(SIGUSR2, &act, NULL);
+	kill(info->si_pid, SIGUSR1);
+}
+
+int	main(void)
+{
+	struct sigaction	sa;
+
+	ft_printf("pid : ");
+	ft_printf("%d\n", getpid());
+	ft_memset(&sa, 0, sizeof(sa));
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = print_signal;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
+	while (1)
 		pause();
-	}
 	return (0);
 }

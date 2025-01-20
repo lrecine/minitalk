@@ -6,72 +6,63 @@
 /*   By: lrecine- <lrecine-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 19:57:11 by lrecine-          #+#    #+#             */
-/*   Updated: 2025/01/16 14:34:00 by lrecine-         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:23:02 by lrecine-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-static int	ft_atoi(const char *str)
-{
-	int		i;
-	int		neg;
-	int		nb;
+int	g_wait_response = 0;
 
-	i = 0;
-	neg = 1;
-	nb = 0;
-	while (str[i] == ' ' || (str[i] >= '\t' && str[i] <= '\r'))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
-			neg = -1;
-		i++;
-	}
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		nb = nb * 10 + (str[i] - '0');
-		i++;
-	}
-	return (nb * neg);
+void	handle_response(int signal)
+{
+	(void)signal;
+	g_wait_response = 1;
 }
 
-void	ft_atob(int pid, char c)
+void	send_bits(int pid, char *str)
 {
-	int	bit;
+	static int	bit;
 
-	bit = 0;
-	while (bit < 8)
+	while (*str)
 	{
-		if ((c & (0x01 << bit)))
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		usleep(500);
-		bit++;
+		bit = 8;
+		while (bit--)
+		{
+			g_wait_response = 0;
+			if ((*str >> bit) & 1)
+				kill(pid, SIGUSR2);
+			else
+				kill(pid, SIGUSR1);
+			while (!g_wait_response)
+				;
+		}
+		str++;
+	}
+	bit = 8;
+	while (bit--)
+	{
+		g_wait_response = 0;
+		kill(pid, SIGUSR1);
+		while (!g_wait_response)
+			;
 	}
 }
 
-int	main(int argc, char **argv)
+int	main(int ac, char **av)
 {
 	int	pid;
-	int	i;
 
-	i = 0;
-	if (argc == 3)
+	signal(SIGUSR1, handle_response);
+	signal(SIGUSR2, handle_response);
+	if (ac == 3)
 	{
-		pid = ft_atoi(argv[1]);
-		while (argv[2][i] != '\0')
-		{
-			ft_atob(pid, argv[2][i]);
-			i++;
-		}
+		pid = ft_atoi(av[1]);
+		send_bits(pid, av[2]);
 	}
 	else
 	{
-		ft_printf("Error\n");
-		return (1);
+		ft_printf("Sintax error:\n");
 	}
 	return (0);
 }
