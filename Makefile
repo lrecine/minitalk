@@ -1,5 +1,6 @@
 NAMEC = client
 NAMES = server
+LIBFT = libft.a
 BONUS_NAMEC = client_bonus
 BONUS_NAMES = server_bonus
 PRINTF = libftprintf.a
@@ -25,24 +26,29 @@ all:	$(NAMEC) $(NAMES)
 
 $(NAMEC) : $(OBJC)
 		@make -C printf
-		$(CC) $(CFLAGS) $(OBJC) $(INCLUDE) printf/$(PRINTF) -o $(NAMEC)
+		@make -C libft
+		@cp libft/libft.a .
+		$(CC) $(CFLAGS) $(OBJC) $(INCLUDE) libft/$(LIBFT) printf/$(PRINTF) -o $(NAMEC)
 
 $(NAMES) : $(OBJS)
 		@make -C printf
-		$(CC) $(CFLAGS) $(OBJS) $(INCLUDE) printf/$(PRINTF) -o $(NAMES)
+		@make -C libft
+		@cp libft/libft.a .
+		$(CC) $(CFLAGS) $(OBJS) $(INCLUDE) libft/$(LIBFT) printf/$(PRINTF) -o $(NAMES)
 
 bonus : $(BONUS_NAMEC) $(BONUS_NAMES)
 
 $(BONUS_NAMEC) : $(OBJBC)
 		@make -C printf
-		$(CC) $(CFLAGS) $(OBJBC) $(INCLUDE) printf/$(PRINTF) -o $(BONUS_NAMEC)	
+		$(CC) $(CFLAGS) $(OBJBC) $(INCLUDE) libft/$(LIBFT) printf/$(PRINTF) -o $(BONUS_NAMEC)	
 
 $(BONUS_NAMES) : $(OBJBS)
 		@make -C printf
-		$(CC) $(CFLAGS) $(OBJBS) $(INCLUDE) printf/$(PRINTF) -o $(BONUS_NAMES)
+		$(CC) $(CFLAGS) $(OBJBS) $(INCLUDE) libft/$(LIBFT) printf/$(PRINTF) -o $(BONUS_NAMES)
 
 clean :
 		make clean -C printf
+		@make fclean -C libft
 		${RM} ${OBJC}
 		${RM} ${OBJS}
 		${RM} ${OBJBC}
@@ -50,8 +56,10 @@ clean :
 
 fclean : clean
 		@make fclean -C printf
+		@make fclean -C libft
 		${RM} $(NAMEC)
 		${RM} $(NAMES)
+		${RM} $(LIBFT)
 		${RM} $(BONUS_NAMEC)
 		${RM} $(BONUS_NAMES)
 		${RM} $(PRINTF)
